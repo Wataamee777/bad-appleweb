@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>白黒動画</title>
+    <title>荒い白黒動画</title>
     <style>
         body {
             display: flex;
@@ -14,12 +14,13 @@
         }
         canvas {
             border: 1px solid white;
+            image-rendering: pixelated; /* 拡大時に荒さを保持 */
         }
     </style>
 </head>
 <body>
     <video id="video" playsinline autoplay loop muted>
-        <source src="bad apple!.mp4" type="video/mp4">
+        <source src="video.mp4" type="video/mp4">
         お使いのブラウザは video タグをサポートしていません。
     </video>
     <canvas id="canvas"></canvas>
@@ -29,6 +30,8 @@
         const canvas = document.getElementById("canvas");
         const ctx = canvas.getContext("2d");
 
+        const pixelSize = 10; // 荒さの調整（数値を大きくするとより荒く）
+
         video.addEventListener("loadeddata", () => {
             console.log("動画読み込み完了");
             canvas.width = video.videoWidth;
@@ -37,19 +40,16 @@
         });
 
         function processVideo() {
-            console.log("Processing video");
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const smallCanvas = document.createElement("canvas");
+            const smallCtx = smallCanvas.getContext("2d");
+
+            // 縮小キャンバスのサイズを設定（小さくして荒く）
+            smallCanvas.width = canvas.width / pixelSize;
+            smallCanvas.height = canvas.height / pixelSize;
+
+            // 小さいキャンバスに動画を描画（縮小）
+            smallCtx.drawImage(video, 0, 0, smallCanvas.width, smallCanvas.height);
+
+            // ピクセルデータ取得
+            let imageData = smallCtx.getImageData(0, 0, smallCanvas.width, smallCanvas.height);
             let data = imageData.data;
-
-            for (let i = 0; i < data.length; i += 4) {
-                let gray = (data[i] + data[i + 1] + data[i + 2]) / 3;
-                data[i] = data[i + 1] = data[i + 2] = gray;
-            }
-
-            ctx.putImageData(imageData, 0, 0);
-            requestAnimationFrame(processVideo);
-        }
-    </script>
-</body>
-</html>
