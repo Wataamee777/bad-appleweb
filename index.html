@@ -18,7 +18,10 @@
     </style>
 </head>
 <body>
-    <video id="video" src="bad apple!.mp4" playsinline autoplay loop muted style="display: none;"></video>
+    <video id="video" playsinline autoplay loop muted>
+        <source src="video.mp4" type="video/mp4">
+        お使いのブラウザは video タグをサポートしていません。
+    </video>
     <canvas id="canvas"></canvas>
 
     <script>
@@ -27,19 +30,21 @@
         const ctx = canvas.getContext("2d");
 
         video.addEventListener("loadeddata", () => {
+            console.log("動画読み込み完了");
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             processVideo();
         });
 
         function processVideo() {
+            console.log("Processing video");
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
             let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
             let data = imageData.data;
 
             for (let i = 0; i < data.length; i += 4) {
                 let gray = (data[i] + data[i + 1] + data[i + 2]) / 3;
-                data[i] = data[i + 1] = data[i + 2] = gray; // 白黒化
+                data[i] = data[i + 1] = data[i + 2] = gray;
             }
 
             ctx.putImageData(imageData, 0, 0);
