@@ -53,3 +53,20 @@
             // ピクセルデータ取得
             let imageData = smallCtx.getImageData(0, 0, smallCanvas.width, smallCanvas.height);
             let data = imageData.data;
+
+            // 白黒化処理
+            for (let i = 0; i < data.length; i += 4) {
+                let gray = (data[i] + data[i + 1] + data[i + 2]) / 3;
+                data[i] = data[i + 1] = data[i + 2] = gray;
+            }
+            smallCtx.putImageData(imageData, 0, 0);
+
+            // 拡大して描画（ピクセル感を出す）
+            ctx.imageSmoothingEnabled = false; // ピクセルをぼかさない
+            ctx.drawImage(smallCanvas, 0, 0, canvas.width, canvas.height);
+
+            requestAnimationFrame(processVideo);
+        }
+    </script>
+</body>
+</html>
