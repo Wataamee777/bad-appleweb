@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>白黒動画</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: black;
+        }
+        canvas {
+            border: 1px solid white;
+        }
+    </style>
+</head>
+<body>
+    <video id="video" src="video.mp4" playsinline autoplay loop muted style="display: none;"></video>
+    <canvas id="canvas"></canvas>
+
+    <script>
+        const video = document.getElementById("video");
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+
+        video.addEventListener("loadeddata", () => {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            processVideo();
+        });
+
+        function processVideo() {
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            let data = imageData.data;
+
+            for (let i = 0; i < data.length; i += 4) {
+                let gray = (data[i] + data[i + 1] + data[i + 2]) / 3;
+                data[i] = data[i + 1] = data[i + 2] = gray; // 白黒化
+            }
+
+            ctx.putImageData(imageData, 0, 0);
+            requestAnimationFrame(processVideo);
+        }
+    </script>
+</body>
+</html>
